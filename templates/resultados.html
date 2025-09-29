@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Resultados - Classificador</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#eef9ff', 100: '#dff2ff', 200: '#bfe5ff', 300: '#99d6ff',
+              400: '#5fc0ff', 500: '#2aa9ff', 600: '#0f8fe6', 700: '#0a73b8',
+              800: '#0a5b8f', 900: '#0a4b75'
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <link rel="icon" href="{{ url_for('static', filename='favicon.svg') }}" type="image/svg+xml" />
+  <script>
+    (function() {
+      const saved = localStorage.getItem('theme');
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      const useDark = saved ? saved === 'dark' : prefersDark;
+      if (useDark) document.documentElement.classList.add('dark');
+    })();
+  </script>
+</head>
+<body class="bg-slate-50 text-slate-900 antialiased dark:bg-slate-900 dark:text-slate-100">
+  <header class="sticky top-0 z-10 border-b border-slate-200/70 bg-white/70 backdrop-blur dark:border-slate-700/50 dark:bg-slate-900/70">
+    <div class="mx-auto flex max-w-5xl items-center justify-between px-4 py-3">
+      <div class="flex items-center gap-3">
+        <img src="{{ url_for('static', filename='favicon.svg') }}" alt="logo" class="h-6 w-6" />
+        <span class="text-sm font-semibold tracking-tight">Classificador</span>
+      </div>
+      <button id="theme-toggle" class="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 shadow-sm hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-800/80">
+        <span id="theme-label">Tema</span>
+      </button>
+    </div>
+  </header>
+  <main class="min-h-[calc(100vh-56px)] flex items-center justify-center px-4 py-10">
+    <div class="w-full max-w-4xl">
+      <div class="mx-auto mb-6 text-center">
+        <h1 class="text-3xl font-semibold tracking-tight">Resultados</h1>
+        <p class="mt-2 text-slate-600 dark:text-slate-400">Veja a categoria predita, a confiança e o conteúdo analisado.</p>
+      </div>
+
+      <section class="rounded-3xl border border-slate-200 bg-white/90 p-6 sm:p-8 shadow-xl backdrop-blur dark:border-slate-700 dark:bg-slate-800/80">
+        <h2 class="text-lg font-medium text-slate-800 dark:text-slate-200">Categoria Predita</h2>
+        <p class="mt-3 inline-flex items-center rounded-full bg-gradient-to-r from-brand-500 to-blue-500 px-4 py-1.5 text-sm font-semibold text-white shadow">{{ categoria }}</p>
+      </section>
+
+      <section class="mt-6 rounded-3xl border border-slate-200 bg-white/90 p-6 sm:p-8 shadow-xl backdrop-blur dark:border-slate-700 dark:bg-slate-800/80">
+        <div class="flex items-center justify-between gap-3">
+          <div class="flex items-center gap-2">
+            <h2 class="text-lg font-medium text-slate-800 dark:text-slate-200">Resposta Sugerida</h2>
+            <button id="open-popover" title="Ver classificação de produtividade" type="button" class="inline-flex h-7 w-7 items-center justify-center rounded-full border border-slate-300 text-slate-600 hover:bg-slate-50 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-700">i</button>
+          </div>
+          <button id="copy-reply" class="inline-flex items-center gap-2 rounded-full bg-slate-900 px-4 py-2 text-sm font-semibold text-white shadow hover:bg-slate-800 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-white" type="button">Copiar</button>
+        </div>
+        <!-- Inline Popover (Disclosure Panel) -->
+        <div id="popover" class="hidden mt-3 w-full rounded-2xl border border-slate-200 bg-white p-4 text-sm shadow dark:border-slate-700 dark:bg-slate-800">
+          <div class="mb-2 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Classificação de Produtividade</div>
+          <div class="mb-3 text-slate-800 dark:text-slate-200">
+            <ul class="list-disc pl-5 space-y-1">
+              <li><span class="font-semibold">Produtivo</span>: Emails que requerem ação ou resposta específica (ex.: solicitações de suporte, atualização de casos em aberto, dúvidas sobre o sistema).</li>
+              <li><span class="font-semibold">Improdutivo</span>: Emails que não necessitam ação imediata (ex.: felicitações, agradecimentos).</li>
+            </ul>
+          </div>
+          <div class="mb-2">
+            <span class="text-slate-600 dark:text-slate-300">Este email foi classificado como:</span>
+            <span class="ml-1 inline-flex items-center rounded-full bg-slate-900 px-2.5 py-0.5 text-xs font-semibold text-white dark:bg-slate-100 dark:text-slate-900">{{ produtividade }}</span>
+          </div>
+          
+        </div>
+        <textarea id="resposta" readonly rows="5" class="mt-3 w-full rounded-2xl border border-slate-200 bg-slate-50/70 p-4 text-sm text-slate-800 shadow-inner outline-none ring-0 dark:border-slate-700 dark:bg-slate-900/60 dark:text-slate-100">{{ resposta }}</textarea>
+      </section>
+
+      <section class="mt-6 rounded-3xl border border-slate-200 bg-white/90 p-6 sm:p-8 shadow-xl backdrop-blur dark:border-slate-700 dark:bg-slate-800/80">
+        <h2 class="text-lg font-medium text-slate-800 dark:text-slate-200">Ranking de Confiança</h2>
+        <div class="mt-4 overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-700">
+          <table class="min-w-full divide-y divide-slate-200 dark:divide-slate-700">
+            <thead class="bg-slate-50/70 dark:bg-slate-800/60">
+              <tr>
+                <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Categoria</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Confiança</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100 bg-white/60 dark:divide-slate-700 dark:bg-slate-800/40">
+              {% for label, score in ranking %}
+              <tr class="hover:bg-slate-50/80 dark:hover:bg-slate-800/70">
+                <td class="px-4 py-3 text-sm text-slate-800 dark:text-slate-200">{{ label }}</td>
+                <td class="px-4 py-3 text-sm text-slate-800 dark:text-slate-200">{{ '%.1f' % (score * 100) }}%</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="mt-6 rounded-3xl border border-slate-200 bg-white/90 p-6 sm:p-8 shadow-xl backdrop-blur dark:border-slate-700 dark:bg-slate-800/80">
+        <h2 class="text-lg font-medium text-slate-800 dark:text-slate-200">Texto do Email</h2>
+        <pre class="mt-3 rounded-2xl border border-slate-200 bg-slate-50/70 p-4 text-sm text-slate-800 whitespace-pre-wrap dark:border-slate-700 dark:bg-slate-900/60 dark:text-slate-100">{{ texto }}</pre>
+      </section>
+
+      <div class="mt-8 text-center">
+        <a class="inline-flex items-center gap-2 rounded-full bg-slate-900 px-5 py-2.5 font-semibold text-white shadow-md transition hover:bg-slate-800 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-white" href="{{ url_for('index') }}">Classificar outro email</a>
+      </div>
+    </div>
+  </main>
+  <script>
+    const btn = document.getElementById('theme-toggle');
+    const label = document.getElementById('theme-label');
+    function setTheme(mode){
+      const root = document.documentElement;
+      if(mode==='dark'){ root.classList.add('dark'); localStorage.setItem('theme','dark'); if(label) label.textContent = 'Escuro'; }
+      else { root.classList.remove('dark'); localStorage.setItem('theme','light'); if(label) label.textContent = 'Claro'; }
+    }
+    (function initTheme(){
+      const saved = localStorage.getItem('theme');
+      const isDark = saved ? saved==='dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+      setTheme(isDark ? 'dark':'light');
+    })();
+    if(btn){ btn.addEventListener('click', ()=>{ const isDark = document.documentElement.classList.contains('dark'); setTheme(isDark ? 'light' : 'dark'); }); }
+
+    // Copy suggested reply
+    const copyBtn = document.getElementById('copy-reply');
+    const replyEl = document.getElementById('resposta');
+    if (copyBtn && replyEl) {
+      copyBtn.addEventListener('click', async () => {
+        try {
+          await navigator.clipboard.writeText(replyEl.value);
+          const original = copyBtn.textContent;
+          copyBtn.textContent = 'Copiado!';
+          setTimeout(() => copyBtn.textContent = original, 1200);
+        } catch (e) {
+          // Fallback
+          replyEl.select();
+          document.execCommand('copy');
+          const original = copyBtn.textContent;
+          copyBtn.textContent = 'Copiado!';
+          setTimeout(() => copyBtn.textContent = original, 1200);
+        }
+      });
+    }
+
+    // Popover toggle and outside click handling
+    const openPop = document.getElementById('open-popover');
+    const popover = document.getElementById('popover');
+    function hidePopover(){ if(popover) popover.classList.add('hidden'); }
+    function togglePopover(){ if(popover) popover.classList.toggle('hidden'); }
+    if (openPop && popover) {
+      openPop.addEventListener('click', (e) => {
+        e.stopPropagation();
+        togglePopover();
+      });
+      document.addEventListener('click', (e) => {
+        if (!popover.classList.contains('hidden')) {
+          const target = e.target;
+          if (!popover.contains(target) && target !== openPop) hidePopover();
+        }
+      });
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') hidePopover();
+      });
+    }
+
+  </script>
+</body>
+</html>

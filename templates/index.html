@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Classificador de Emails</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    // Tailwind config (palette + dark mode via class)
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#eef9ff', 100: '#dff2ff', 200: '#bfe5ff', 300: '#99d6ff',
+              400: '#5fc0ff', 500: '#2aa9ff', 600: '#0f8fe6', 700: '#0a73b8',
+              800: '#0a5b8f', 900: '#0a4b75'
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <link rel="icon" href="{{ url_for('static', filename='favicon.svg') }}" type="image/svg+xml" />
+  <script>
+    // Apply saved theme asap to avoid FOUC
+    (function() {
+      const saved = localStorage.getItem('theme');
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      const useDark = saved ? saved === 'dark' : prefersDark;
+      if (useDark) document.documentElement.classList.add('dark');
+    })();
+  </script>
+</head>
+<body class="bg-slate-50 text-slate-900 antialiased dark:bg-slate-900 dark:text-slate-100">
+  <header class="sticky top-0 z-10 border-b border-slate-200/70 bg-white/70 backdrop-blur dark:border-slate-700/50 dark:bg-slate-900/70">
+    <div class="mx-auto flex max-w-5xl items-center justify-between px-4 py-3">
+      <div class="flex items-center gap-3">
+        <img src="{{ url_for('static', filename='favicon.svg') }}" alt="logo" class="h-6 w-6" />
+        <span class="text-sm font-semibold tracking-tight">Classificador</span>
+      </div>
+      <button id="theme-toggle" class="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 shadow-sm hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-800/80">
+        <span id="theme-label">Tema</span>
+      </button>
+    </div>
+  </header>
+  <main class="min-h-[calc(100vh-56px)] flex items-center justify-center px-4 py-10">
+    <div class="w-full max-w-2xl">
+      <div class="mx-auto mb-6 text-center">
+        <h1 class="text-3xl font-semibold tracking-tight">Classificador de Emails</h1>
+        <p class="mt-2 text-slate-600 dark:text-slate-400">Cole o conteúdo ou envie um arquivo. Interface minimalista e suave.</p>
+      </div>
+
+      {% with messages = get_flashed_messages() %}
+        {% if messages %}
+          <div class="mb-4 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-amber-900 shadow-sm dark:border-amber-300/30 dark:bg-amber-200/20 dark:text-amber-200">
+            {% for m in messages %}<div>{{ m }}</div>{% endfor %}
+          </div>
+        {% endif %}
+      {% endwith %}
+
+      <div class="rounded-3xl border border-slate-200 bg-white/90 shadow-xl backdrop-blur dark:border-slate-700 dark:bg-slate-800/80">
+        <form id="email-form" action="{{ url_for('processar') }}" method="post" enctype="multipart/form-data" class="p-6 sm:p-8">
+          <label for="email-text" class="block text-sm font-medium text-slate-700 dark:text-slate-200">Insira o texto do email</label>
+          <div class="mt-2">
+            <textarea id="email-text" name="email-text" rows="8" placeholder="Cole o conteúdo aqui..." class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-900 shadow-inner outline-none ring-0 focus:border-brand-400 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"></textarea>
+          </div>
+
+          <div class="my-4 flex items-center justify-center">
+            <div class="h-px w-full bg-gradient-to-r from-transparent via-slate-200 to-transparent dark:via-slate-700"></div>
+            <span class="mx-3 text-xs uppercase tracking-wider text-slate-400 dark:text-slate-500">ou</span>
+            <div class="h-px w-full bg-gradient-to-r from-transparent via-slate-200 to-transparent dark:via-slate-700"></div>
+          </div>
+
+          <label for="email-file" class="block text-sm font-medium text-slate-700 dark:text-slate-200">Carregue um arquivo (.txt ou .pdf)</label>
+          <input id="email-file" type="file" name="email-file" accept=".txt,.pdf" class="mt-2 block w-full cursor-pointer rounded-2xl border border-dashed border-slate-300 bg-slate-50 px-4 py-3 text-slate-700 file:mr-4 file:cursor-pointer file:rounded-xl file:border-0 file:bg-brand-500 file:px-4 file:py-2 file:text-white hover:file:bg-brand-600 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200" />
+
+          <div class="mt-6 flex items-center">
+            <button type="submit" class="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-brand-500 to-blue-500 px-5 py-2.5 font-semibold text-white shadow-md transition hover:shadow-lg">
+              <span>Processar</span>
+            </button>
+            <span id="status" class="ml-3 text-sm text-slate-500 dark:text-slate-400" aria-live="polite"></span>
+          </div>
+        </form>
+      </div>
+
+      <p class="mt-4 text-center text-sm text-slate-500 dark:text-slate-400">Dica: O primeiro processamento pode demorar para baixar o modelo. ☕</p>
+    </div>
+  </main>
+
+  <script>
+    // Theme toggle
+    const btn = document.getElementById('theme-toggle');
+    const label = document.getElementById('theme-label');
+    function setTheme(mode){
+      const root = document.documentElement;
+      if(mode==='dark'){ root.classList.add('dark'); localStorage.setItem('theme','dark'); label.textContent = 'Escuro'; }
+      else { root.classList.remove('dark'); localStorage.setItem('theme','light'); label.textContent = 'Claro'; }
+    }
+    (function initTheme(){
+      const saved = localStorage.getItem('theme');
+      const isDark = saved ? saved==='dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+      setTheme(isDark ? 'dark':'light');
+    })();
+    btn.addEventListener('click', ()=>{
+      const isDark = document.documentElement.classList.contains('dark');
+      setTheme(isDark ? 'light' : 'dark');
+    });
+
+    const form = document.getElementById('email-form');
+    const statusEl = document.getElementById('status');
+    form.addEventListener('submit', () => {
+      statusEl.textContent = 'Processando...';
+    });
+  </script>
+</body>
+</html>

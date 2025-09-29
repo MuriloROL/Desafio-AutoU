@@ -1,0 +1,17 @@
+:root{--bg:#0f172a;--card:#111827;--text:#e5e7eb;--muted:#9ca3af;--accent:#22d3ee;--border:#1f2937}
+*{box-sizing:border-box}html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
+.container{max-width:880px;margin:40px auto;padding:0 20px}
+.h1,h1{font-size:28px;margin:0 0 16px}
+.label{display:block;margin:16px 0 8px;color:var(--muted)}
+textarea{width:100%;padding:12px;border:1px solid var(--border);border-radius:8px;background:#0b1220;color:var(--text);resize:vertical}
+input[type=file]{display:block;margin:8px 0 16px}
+.btn{display:inline-block;background:linear-gradient(90deg,#06b6d4,#3b82f6);color:#081226;border:0;border-radius:999px;padding:10px 16px;font-weight:600;cursor:pointer;text-decoration:none}
+.status{margin-left:12px;color:var(--muted)}
+.alert{background:#1f2937;border:1px solid #334155;color:#fde68a;padding:10px 12px;border-radius:8px;margin-bottom:16px}
+.divider{margin:12px 0;color:var(--muted);text-align:center}
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;margin:16px 0}
+.pill{display:inline-block;background:#0ea5e9;color:#001014;padding:6px 10px;border-radius:999px;font-weight:700}
+.table{width:100%;border-collapse:collapse}
+.table th,.table td{border-bottom:1px solid var(--border);padding:8px 6px;text-align:left}
+.pre{white-space:pre-wrap;word-wrap:break-word;background:#0b1220;border:1px solid var(--border);border-radius:8px;padding:12px}
+.footnote{margin-top:16px;color:var(--muted)}
