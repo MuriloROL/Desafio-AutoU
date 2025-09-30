@@ -90,8 +90,9 @@
           </div>
 
           <div class="mt-6 flex items-center">
-            <button type="submit" class="inline-flex items-center gap-2 rounded-full bg-brand-500 hover:bg-brand-600 px-5 py-2.5 font-semibold text-white shadow-md transition">
-              <span>Processar</span>
+            <button id="processar-btn" type="submit" class="inline-flex items-center gap-2 rounded-full bg-brand-500 hover:bg-brand-600 px-5 py-2.5 font-semibold text-white shadow-md transition">
+              <img id="spinner" src="{{ url_for('static', filename='270-ring.svg') }}" alt="Carregando" class="hidden h-5 w-5" />
+              <span id="btn-text">Processar</span>
             </button>
             <span id="status" class="ml-3 text-sm text-slate-500 dark:text-neutral-400" aria-live="polite"></span>
           </div>
@@ -154,8 +155,51 @@
 
     const form = document.getElementById('email-form');
     const statusEl = document.getElementById('status');
-    form.addEventListener('submit', () => {
-      statusEl.textContent = 'Processando...';
+    const processBtn = document.getElementById('processar-btn');
+    const btnText = document.getElementById('btn-text');
+    const spinner = document.getElementById('spinner');
+
+    // Ao enviar, mostrar spinner, esconder texto do botão e alternar mensagens
+    form.addEventListener('submit', async (e) => {
+      // Intercepta o submit para enviar via fetch e manter a página ativa
+      if (e && typeof e.preventDefault === 'function') e.preventDefault();
+      if (spinner) spinner.classList.remove('hidden');
+      if (btnText) btnText.classList.add('sr-only');
+      if (processBtn) processBtn.setAttribute('disabled', 'true');
+
+      const steps = ['Acessando Email', 'Lendo Email', 'Processando', 'Processando...', 'Processando... .', 'Processando... ..', 'Processando... ...'];
+      let i = 0;
+      let stop = false;
+      if (statusEl) statusEl.textContent = steps[i];
+      // Usa loop com setTimeout para maior confiabilidade durante operações longas
+      function rotate() {
+        if (stop) return;
+        i = (i + 1) % steps.length;
+        if (statusEl) statusEl.textContent = steps[i];
+        setTimeout(rotate, 4000);
+      }
+      setTimeout(rotate, 4000);
+
+      try {
+        const fd = new FormData(form);
+        // Aguarda um frame para garantir pintura antes de iniciar o fetch
+        await new Promise(requestAnimationFrame);
+        const resp = await fetch(form.action, { method: 'POST', body: fd });
+        const html = await resp.text();
+        stop = true;
+        // Substitui o documento atual pelo HTML retornado (mesmo efeito de navegação)
+        document.open();
+        document.write(html);
+        document.close();
+      } catch (err) {
+        stop = true;
+        if (statusEl) statusEl.textContent = 'Falha ao processar. Verifique sua conexão e tente novamente.';
+        if (spinner) spinner.classList.add('hidden');
+        if (btnText) btnText.classList.remove('sr-only');
+        if (processBtn) processBtn.removeAttribute('disabled');
+        // Opcional: log no console para depuração
+        console.error('Erro ao enviar formulário:', err);
+      }
     });
   </script>
 </body>
