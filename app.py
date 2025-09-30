@@ -14,32 +14,37 @@ from nltk.corpus import stopwords
 from utils.extract import extract_text_from_pdf
 
 ALLOWED_EXTENSIONS = {"txt", "pdf"}
+# Tamanho máximo padrão para upload em KB (configurável via env MAX_UPLOAD_KB)
+MAX_UPLOAD_KB = int(os.getenv("MAX_UPLOAD_KB", "100"))
+MAX_UPLOAD_BYTES = MAX_UPLOAD_KB * 1024
 
 # Default categories for finance email classification (can be overridden via env VAR CATEGORIES)
 DEFAULT_CATEGORIES = [
-    "fatura",
-    "comprovante",
-    "cobrança",
-    "oferta",
-    "spam",
-    "suporte",
-    "relatório",
-    "alerta de segurança",
-    "demissão",
+    "Fatura",
+    "Comprovante",
+    "Cobrança",
+    "Oferta",
+    "Spam",
+    "Suporte",
+    "Relatório",
+    "Alerta de segurança",
+    "Demissão",
 ]
 
-# Deterministic mapping from category -> produtividade
-CATEGORY_TO_PRODUCTIVITY = {
-    "demissão": "Produtivo",
-    "comprovante": "Produtivo",
-    "cobrança": "Produtivo",
-    "relatório": "Produtivo",
-    "oferta": "Improdutivo",
-    "suporte": "Produtivo",
-    "alerta de segurança": "Improdutivo",
-    "spam": "Improdutivo",
-    "fatura": "Produtivo",
+# Deterministic mapping from category -> produtividade (case-insensitive)
+_CATEGORY_TO_PRODUCTIVITY_RAW = {
+    "Demissão": "Produtivo",
+    "Comprovante": "Produtivo",
+    "Cobrança": "Produtivo",
+    "Relatório": "Produtivo",
+    "Oferta": "Improdutivo",
+    "Suporte": "Produtivo",
+    "Alerta de segurança": "Improdutivo",
+    "Spam": "Improdutivo",
+    "Fatura": "Produtivo",
 }
+# Normalize keys to lowercase for lookup after lowercasing detected category
+CATEGORY_TO_PRODUCTIVITY = {k.lower(): v for k, v in _CATEGORY_TO_PRODUCTIVITY_RAW.items()}
 
 
 def get_categories() -> List[str]:
@@ -103,6 +108,44 @@ def preprocess_text(text: str) -> str:
     return " ".join(tokens)
 
 
+# Regras simples para mensagens triviais
+def is_trivial_message(text: str) -> bool:
+    """Retorna True se o texto tiver apenas uma palavra ou for composto apenas por números.
+
+    - Uma palavra: considera tokens alfanuméricos; se houver <= 1 token, considera trivial.
+    - Apenas números: todos os tokens são dígitos.
+    """
+    cleaned = (text or "").strip()
+    if not cleaned:
+        return False  # vazio já é tratado anteriormente
+    tokens = re.findall(r"[A-Za-zÀ-ÖØ-öø-ÿ0-9]+", cleaned)
+    # Regra ajustada: até 5 tokens é considerado trivial
+    if len(tokens) <= 5:
+        return True
+    if all(tok.isdigit() for tok in tokens):
+        return True
+    return False
+
+
+# Helper: obter tamanho do arquivo sem consumir o stream
+def _get_file_size_bytes(file) -> int:
+    try:
+        pos = file.stream.tell()
+        file.stream.seek(0, os.SEEK_END)
+        size = file.stream.tell()
+        file.stream.seek(pos)
+        return int(size)
+    except Exception:
+        # Fallback: tente ler sem quebrar demasiado
+        try:
+            data = file.read()
+            size = len(data)
+            # reposiciona para início para processamento posterior
+            from io import BytesIO
+            file.stream = BytesIO(data)
+            return int(size)
+        except Exception:
+            return 0
 def classify_productivity(text: str) -> Tuple[str, List[Tuple[str, float]]]:
     """Classify into Produtivo vs Improdutivo using zero-shot with PT hypothesis."""
     clf = get_classifier()
@@ -244,6 +287,14 @@ def read_uploaded_text() -> Optional[str]:
         return None
     file = request.files["email-file"]
     if file and file.filename and allowed_file(file.filename):
+        # Verificar tamanho do arquivo
+        try:
+            size = _get_file_size_bytes(file)
+        except Exception:
+            size = 0
+        if size and size > MAX_UPLOAD_BYTES:
+            flash(f"Arquivo excede o limite de {MAX_UPLOAD_KB} KB (tamanho: {size // 1024} KB).")
+            return None
         filename = secure_filename(file.filename)
         ext = filename.rsplit(".", 1)[1].lower()
         if ext == "txt":
@@ -276,16 +327,26 @@ def create_app():
             flash("Nenhum conteúdo de email fornecido. Cole o texto ou envie um .txt/.pdf.")
             return redirect(url_for("index"))
 
-        categoria, ranking = classify_text(text)
-        resposta = generate_response_for_category(text, categoria)
-        # Determinar produtividade a partir da categoria (fallback para modelo se desconhecida)
-        cat_key = (categoria or "").strip().lower()
-        mapped = CATEGORY_TO_PRODUCTIVITY.get(cat_key)
-        if mapped:
-            prod_label = mapped
-            prod_ranking = [("Produtivo", 1.0), ("Improdutivo", 0.0)] if mapped == "Produtivo" else [("Improdutivo", 1.0), ("Produtivo", 0.0)]
+        # Regra: se for mensagem trivial (uma palavra OU apenas números), classificar como spam
+        if is_trivial_message(text):
+            categoria = "spam"
+            ranking = [("spam", 1.0)]
+            resposta = ""  # Sem resposta sugerida para SPAM
+            prod_label = "Improdutivo"
+            prod_ranking = [("Improdutivo", 1.0), ("Produtivo", 0.0)]
+            is_spam = True
         else:
-            prod_label, prod_ranking = classify_productivity(text)
+            categoria, ranking = classify_text(text)
+            resposta = generate_response_for_category(text, categoria)
+            # Determinar produtividade a partir da categoria (fallback para modelo se desconhecida)
+            cat_key = (categoria or "").strip().lower()
+            mapped = CATEGORY_TO_PRODUCTIVITY.get(cat_key)
+            if mapped:
+                prod_label = mapped
+                prod_ranking = [("Produtivo", 1.0), ("Improdutivo", 0.0)] if mapped == "Produtivo" else [("Improdutivo", 1.0), ("Produtivo", 0.0)]
+            else:
+                prod_label, prod_ranking = classify_productivity(text)
+            is_spam = (cat_key == "spam")
         return render_template(
             "resultados.html",
             texto=text,
@@ -294,6 +355,7 @@ def create_app():
             resposta=resposta,
             produtividade=prod_label,
             produtividade_ranking=prod_ranking,
+            is_spam=is_spam,
         )
 
     @app.route("/api/processar", methods=["POST"])
@@ -301,6 +363,16 @@ def create_app():
         # Accept both form and JSON
         text = request.form.get("email-text")
         if not text and "email-file" in request.files:
+            # Validação explícita de tamanho para API (resposta 413)
+            upfile = request.files["email-file"]
+            if upfile and upfile.filename and allowed_file(upfile.filename):
+                size = _get_file_size_bytes(upfile)
+                if size and size > MAX_UPLOAD_BYTES:
+                    return {
+                        "error": "Arquivo muito grande",
+                        "limit_kb": int(MAX_UPLOAD_KB),
+                        "size_kb": int(size // 1024),
+                    }, 413
             text = read_uploaded_text()
         if not text:
             payload = request.get_json(silent=True) or {}
@@ -308,16 +380,23 @@ def create_app():
         if not text:
             return {"error": "Nenhum conteúdo fornecido."}, 400
 
-        # Alinhar API com a classificação por categorias e resposta sugerida, e produtividade
-        categoria, ranking = classify_text(text)
-        resposta = generate_response_for_category(text, categoria)
-        cat_key = (categoria or "").strip().lower()
-        mapped = CATEGORY_TO_PRODUCTIVITY.get(cat_key)
-        if mapped:
-            prod_label = mapped
-            prod_ranking = [("Produtivo", 1.0), ("Improdutivo", 0.0)] if mapped == "Produtivo" else [("Improdutivo", 1.0), ("Produtivo", 0.0)]
+        # Alinhar API com a regra de mensagens triviais
+        if is_trivial_message(text):
+            categoria = "spam"
+            ranking = [("spam", 1.0)]
+            resposta = ""
+            prod_label = "Improdutivo"
+            prod_ranking = [("Improdutivo", 1.0), ("Produtivo", 0.0)]
         else:
-            prod_label, prod_ranking = classify_productivity(text)
+            categoria, ranking = classify_text(text)
+            resposta = generate_response_for_category(text, categoria)
+            cat_key = (categoria or "").strip().lower()
+            mapped = CATEGORY_TO_PRODUCTIVITY.get(cat_key)
+            if mapped:
+                prod_label = mapped
+                prod_ranking = [("Produtivo", 1.0), ("Improdutivo", 0.0)] if mapped == "Produtivo" else [("Improdutivo", 1.0), ("Produtivo", 0.0)]
+            else:
+                prod_label, prod_ranking = classify_productivity(text)
         return {
             "categoria": categoria,
             "resposta": resposta,

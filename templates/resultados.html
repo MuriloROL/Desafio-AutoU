@@ -12,16 +12,16 @@
         extend: {
           colors: {
             brand: {
-              50: '#eef9ff', 100: '#dff2ff', 200: '#bfe5ff', 300: '#99d6ff',
-              400: '#5fc0ff', 500: '#2aa9ff', 600: '#0f8fe6', 700: '#0a73b8',
-              800: '#0a5b8f', 900: '#0a4b75'
+              50: '#FFF4E5', 100: '#FCE7C8', 200: '#F7D096', 300: '#F0B45A',
+              400: '#DA8F1A', 500: '#C97F05', 600: '#A86F04', 700: '#865803',
+              800: '#6B4602', 900: '#553802'
             }
           }
         }
       }
     }
   </script>
-  <link rel="icon" href="{{ url_for('static', filename='favicon.svg') }}" type="image/svg+xml" />
+  <link rel="icon" href="{{ url_for('static', filename='logo-autou.png') }}" type="image/png" />
   <script>
     (function() {
       const saved = localStorage.getItem('theme');
@@ -31,15 +31,25 @@
     })();
   </script>
 </head>
-<body class="bg-slate-50 text-slate-900 antialiased dark:bg-slate-900 dark:text-slate-100">
-  <header class="sticky top-0 z-10 border-b border-slate-200/70 bg-white/70 backdrop-blur dark:border-slate-700/50 dark:bg-slate-900/70">
+<body class="bg-slate-50 text-slate-900 antialiased dark:bg-neutral-950 dark:text-neutral-200">
+  <header class="sticky top-0 z-10 border-b border-slate-200/70 bg-white/70 backdrop-blur dark:border-neutral-800/50 dark:bg-neutral-950/70">
     <div class="mx-auto flex max-w-5xl items-center justify-between px-4 py-3">
       <div class="flex items-center gap-3">
-        <img src="{{ url_for('static', filename='favicon.svg') }}" alt="logo" class="h-6 w-6" />
+        <img src="{{ url_for('static', filename='logo-autou.png') }}" alt="logo" class="h-6 w-12" />
         <span class="text-sm font-semibold tracking-tight">Classificador</span>
       </div>
-      <button id="theme-toggle" class="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 shadow-sm hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-800/80">
-        <span id="theme-label">Tema</span>
+      <button id="theme-toggle" aria-label="Alternar tema" title="Alternar tema" class="group relative inline-flex items-center rounded-full border border-slate-200 bg-white p-1 text-xs font-medium text-slate-700 shadow-sm hover:bg-slate-50 dark:border-neutral-800 dark:bg-neutral-900 dark:text-neutral-300 dark:hover:bg-neutral-900/80">
+        <div class="relative inline-flex h-8 w-16 items-center justify-between rounded-full bg-slate-200 px-2 text-base dark:bg-neutral-700">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4">
+            <circle cx="12" cy="12" r="4"></circle>
+            <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"></path>
+          </svg>
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4">
+            <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"></path>
+          </svg>
+          <div id="theme-thumb" class="absolute left-1 top-1 h-6 w-6 rounded-full bg-white shadow transition-transform duration-300 ease-out dark:bg-neutral-100"></div>
+        </div>
+        <span id="theme-label" class="sr-only">Tema</span>
       </button>
     </div>
   </header>
@@ -47,55 +57,68 @@
     <div class="w-full max-w-4xl">
       <div class="mx-auto mb-6 text-center">
         <h1 class="text-3xl font-semibold tracking-tight">Resultados</h1>
-        <p class="mt-2 text-slate-600 dark:text-slate-400">Veja a categoria predita, a confiança e o conteúdo analisado.</p>
+        <p class="mt-2 text-slate-600 dark:text-neutral-400">Veja a categoria predita, a confiança e o conteúdo analisado.</p>
       </div>
 
-      <section class="rounded-3xl border border-slate-200 bg-white/90 p-6 sm:p-8 shadow-xl backdrop-blur dark:border-slate-700 dark:bg-slate-800/80">
+      <section class="rounded-3xl border border-slate-200 bg-white/90 p-6 sm:p-8 shadow-xl backdrop-blur dark:border-neutral-800 dark:bg-neutral-900/80">
         <h2 class="text-lg font-medium text-slate-800 dark:text-slate-200">Categoria Predita</h2>
-        <p class="mt-3 inline-flex items-center rounded-full bg-gradient-to-r from-brand-500 to-blue-500 px-4 py-1.5 text-sm font-semibold text-white shadow">{{ categoria }}</p>
+        <p class="mt-3 inline-flex items-center rounded-full bg-brand-500 px-4 py-1.5 text-sm font-semibold text-white shadow">{{ categoria }}</p>
       </section>
 
-      <section class="mt-6 rounded-3xl border border-slate-200 bg-white/90 p-6 sm:p-8 shadow-xl backdrop-blur dark:border-slate-700 dark:bg-slate-800/80">
+      <section class="mt-6 rounded-3xl border border-slate-200 bg-white/90 p-6 sm:p-8 shadow-xl backdrop-blur dark:border-neutral-800 dark:bg-neutral-900/80">
         <div class="flex items-center justify-between gap-3">
-          <div class="flex items-center gap-2">
-            <h2 class="text-lg font-medium text-slate-800 dark:text-slate-200">Resposta Sugerida</h2>
-            <button id="open-popover" title="Ver classificação de produtividade" type="button" class="inline-flex h-7 w-7 items-center justify-center rounded-full border border-slate-300 text-slate-600 hover:bg-slate-50 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-700">i</button>
-          </div>
-          <button id="copy-reply" class="inline-flex items-center gap-2 rounded-full bg-slate-900 px-4 py-2 text-sm font-semibold text-white shadow hover:bg-slate-800 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-white" type="button">Copiar</button>
+          <h2 class="text-lg font-medium text-slate-800 dark:text-slate-200">Resposta Sugerida</h2>
+          <button id="copy-reply" class="inline-flex items-center gap-2 rounded-full bg-brand-500 hover:bg-brand-600 px-4 py-2 text-sm font-semibold text-white shadow disabled:opacity-50 disabled:cursor-not-allowed" type="button" {% if is_spam %}disabled aria-disabled="true" title="Sem resposta para spam"{% endif %}>Copiar</button>
         </div>
-        <!-- Inline Popover (Disclosure Panel) -->
-        <div id="popover" class="hidden mt-3 w-full rounded-2xl border border-slate-200 bg-white p-4 text-sm shadow dark:border-slate-700 dark:bg-slate-800">
-          <div class="mb-2 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Classificação de Produtividade</div>
-          <div class="mb-3 text-slate-800 dark:text-slate-200">
-            <ul class="list-disc pl-5 space-y-1">
-              <li><span class="font-semibold">Produtivo</span>: Emails que requerem ação ou resposta específica (ex.: solicitações de suporte, atualização de casos em aberto, dúvidas sobre o sistema).</li>
-              <li><span class="font-semibold">Improdutivo</span>: Emails que não necessitam ação imediata (ex.: felicitações, agradecimentos).</li>
-            </ul>
+        <textarea id="resposta" readonly rows="5" class="mt-3 w-full rounded-2xl border border-slate-200 bg-slate-50/70 p-4 text-sm text-slate-800 shadow-inner outline-none ring-0 dark:border-neutral-800 dark:bg-neutral-950/60 dark:text-neutral-200" {% if is_spam %}disabled aria-disabled="true"{% endif %}>{{ resposta }}</textarea>
+        
+        <!-- Modal para SPAM -->
+        <div id="spam-modal" class="{% if is_spam %}flex{% else %}hidden{% endif %} fixed inset-0 z-50 items-center justify-center bg-black/50 p-4">
+          <div class="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-6 shadow-xl dark:border-neutral-800 dark:bg-neutral-900">
+            <div class="flex items-start gap-3">
+              <div class="flex h-8 w-8 items-center justify-center rounded-full bg-red-600 text-white">!</div>
+              <div class="flex-1">
+                <h3 class="text-base font-semibold text-slate-900 dark:text-neutral-100">Sem resposta para spam</h3>
+                <p class="mt-1 text-sm text-slate-600 dark:text-neutral-300">A mensagem foi classificada como <strong>spam</strong> por ser muito curta ou conter apenas números. Não há resposta sugerida.</p>
+              </div>
+            </div>
+            <div class="mt-4 flex justify-end">
+              <button id="close-spam-modal" type="button" class="inline-flex items-center rounded-full bg-brand-500 hover:bg-brand-600 px-4 py-2 text-sm font-semibold text-white">Entendi</button>
+            </div>
           </div>
-          <div class="mb-2">
-            <span class="text-slate-600 dark:text-slate-300">Este email foi classificado como:</span>
-            <span class="ml-1 inline-flex items-center rounded-full bg-slate-900 px-2.5 py-0.5 text-xs font-semibold text-white dark:bg-slate-100 dark:text-slate-900">{{ produtividade }}</span>
-          </div>
-          
         </div>
-        <textarea id="resposta" readonly rows="5" class="mt-3 w-full rounded-2xl border border-slate-200 bg-slate-50/70 p-4 text-sm text-slate-800 shadow-inner outline-none ring-0 dark:border-slate-700 dark:bg-slate-900/60 dark:text-slate-100">{{ resposta }}</textarea>
       </section>
 
-      <section class="mt-6 rounded-3xl border border-slate-200 bg-white/90 p-6 sm:p-8 shadow-xl backdrop-blur dark:border-slate-700 dark:bg-slate-800/80">
-        <h2 class="text-lg font-medium text-slate-800 dark:text-slate-200">Ranking de Confiança</h2>
-        <div class="mt-4 overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-700">
-          <table class="min-w-full divide-y divide-slate-200 dark:divide-slate-700">
-            <thead class="bg-slate-50/70 dark:bg-slate-800/60">
+      <!-- Box: Classificação de Produtividade -->
+      <section class="mt-6 rounded-3xl border border-slate-200 bg-white/90 p-6 sm:p-8 shadow-xl backdrop-blur dark:border-neutral-800 dark:bg-neutral-900/80">
+        <h2 class="text-lg font-medium text-slate-800 dark:text-slate-200">Classificação de Produtividade</h2>
+        <div class="mt-3 text-sm text-slate-700 dark:text-neutral-300">
+          <ul class="list-disc pl-5 space-y-1">
+            <li><span class="font-semibold">Produtivo</span>: Emails que requerem ação ou resposta específica (ex.: solicitações de suporte, atualização de casos em aberto, dúvidas sobre o sistema).</li>
+            <li><span class="font-semibold">Improdutivo</span>: Emails que não necessitam ação imediata (ex.: felicitações, agradecimentos).</li>
+          </ul>
+        </div>
+        <div class="mt-3">
+          <span class="text-slate-600 dark:text-neutral-300">Este email foi classificado como:</span>
+          <span class="ml-2 inline-flex items-center rounded-full bg-brand-500 px-2.5 py-0.5 text-xs font-semibold text-white">{{ produtividade }}</span>
+        </div>
+      </section>
+
+      <section class="mt-6 rounded-3xl border border-neutral-200 bg-white/90 p-6 sm:p-8 shadow-xl backdrop-blur dark:border-neutral-800 dark:bg-neutral-900/80">
+        <h2 class="text-lg font-medium text-neutral-800 dark:text-neutral-200">Ranking de Confiança</h2>
+        <div class="mt-4 overflow-hidden rounded-2xl border border-neutral-200 dark:border-neutral-800">
+          <table class="min-w-full divide-y divide-neutral-200 dark:divide-neutral-800">
+            <thead class="bg-neutral-50/70 dark:bg-neutral-900/60">
               <tr>
-                <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Categoria</th>
-                <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Confiança</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-neutral-500 dark:text-neutral-400">Categoria</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-neutral-500 dark:text-neutral-400">Confiança</th>
               </tr>
             </thead>
-            <tbody class="divide-y divide-slate-100 bg-white/60 dark:divide-slate-700 dark:bg-slate-800/40">
+            <tbody class="divide-y divide-neutral-100 bg-white/60 dark:divide-neutral-800 dark:bg-neutral-900/40">
               {% for label, score in ranking %}
-              <tr class="hover:bg-slate-50/80 dark:hover:bg-slate-800/70">
-                <td class="px-4 py-3 text-sm text-slate-800 dark:text-slate-200">{{ label }}</td>
-                <td class="px-4 py-3 text-sm text-slate-800 dark:text-slate-200">{{ '%.1f' % (score * 100) }}%</td>
+              <tr class="hover:bg-neutral-50/80 dark:hover:bg-neutral-900/70">
+                <td class="px-4 py-3 text-sm text-neutral-800 dark:text-neutral-200">{{ label }}</td>
+                <td class="px-4 py-3 text-sm text-neutral-800 dark:text-neutral-200">{{ '%.1f' % (score * 100) }}%</td>
               </tr>
               {% endfor %}
             </tbody>
@@ -103,13 +126,13 @@
         </div>
       </section>
 
-      <section class="mt-6 rounded-3xl border border-slate-200 bg-white/90 p-6 sm:p-8 shadow-xl backdrop-blur dark:border-slate-700 dark:bg-slate-800/80">
-        <h2 class="text-lg font-medium text-slate-800 dark:text-slate-200">Texto do Email</h2>
-        <pre class="mt-3 rounded-2xl border border-slate-200 bg-slate-50/70 p-4 text-sm text-slate-800 whitespace-pre-wrap dark:border-slate-700 dark:bg-slate-900/60 dark:text-slate-100">{{ texto }}</pre>
+      <section class="mt-6 rounded-3xl border border-neutral-200 bg-white/90 p-6 sm:p-8 shadow-xl backdrop-blur dark:border-neutral-800 dark:bg-neutral-900/80">
+        <h2 class="text-lg font-medium text-neutral-800 dark:text-neutral-200">Texto do Email</h2>
+        <pre class="mt-3 rounded-2xl border border-neutral-200 bg-neutral-50/70 p-4 text-sm text-neutral-800 whitespace-pre-wrap dark:border-neutral-800 dark:bg-neutral-950/60 dark:text-neutral-200">{{ texto }}</pre>
       </section>
 
       <div class="mt-8 text-center">
-        <a class="inline-flex items-center gap-2 rounded-full bg-slate-900 px-5 py-2.5 font-semibold text-white shadow-md transition hover:bg-slate-800 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-white" href="{{ url_for('index') }}">Classificar outro email</a>
+        <a class="inline-flex items-center gap-2 rounded-full bg-brand-500 hover:bg-brand-600 px-5 py-2.5 font-semibold text-white shadow-md transition" href="{{ url_for('index') }}">Classificar outro email</a>
       </div>
     </div>
   </main>
@@ -118,8 +141,18 @@
     const label = document.getElementById('theme-label');
     function setTheme(mode){
       const root = document.documentElement;
-      if(mode==='dark'){ root.classList.add('dark'); localStorage.setItem('theme','dark'); if(label) label.textContent = 'Escuro'; }
-      else { root.classList.remove('dark'); localStorage.setItem('theme','light'); if(label) label.textContent = 'Claro'; }
+      const thumb = document.getElementById('theme-thumb');
+      if(mode==='dark'){
+        root.classList.add('dark');
+        localStorage.setItem('theme','dark');
+        if(label) label.textContent = 'Escuro';
+        if(thumb) thumb.classList.add('translate-x-8');
+      } else {
+        root.classList.remove('dark');
+        localStorage.setItem('theme','light');
+        if(label) label.textContent = 'Claro';
+        if(thumb) thumb.classList.remove('translate-x-8');
+      }
     }
     (function initTheme(){
       const saved = localStorage.getItem('theme');
@@ -133,6 +166,7 @@
     const replyEl = document.getElementById('resposta');
     if (copyBtn && replyEl) {
       copyBtn.addEventListener('click', async () => {
+        if (copyBtn.hasAttribute('disabled')) return; // Guard for spam
         try {
           await navigator.clipboard.writeText(replyEl.value);
           const original = copyBtn.textContent;
@@ -168,6 +202,16 @@
       document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') hidePopover();
       });
+    }
+
+    // SPAM modal close handlers
+    const spamModal = document.getElementById('spam-modal');
+    const closeSpam = document.getElementById('close-spam-modal');
+    function hideSpam(){ if(spamModal) spamModal.classList.add('hidden'); }
+    if (spamModal) {
+      if (closeSpam) closeSpam.addEventListener('click', hideSpam);
+      spamModal.addEventListener('click', (e) => { if (e.target === spamModal) hideSpam(); });
+      document.addEventListener('keydown', (e) => { if (e.key === 'Escape') hideSpam(); });
     }
 
   </script>
