@@ -75,7 +75,10 @@
           <h2 class="text-lg font-medium text-slate-800 dark:text-slate-200">Entrada de Email</h2>
 
           <label for="email-file" class="mt-4 block text-sm font-medium text-slate-700 dark:text-neutral-200">Upload de Arquivo (.txt, .pdf)</label>
-          <input id="email-file" type="file" name="email-file" accept=".txt,.pdf" class="mt-2 block w-full cursor-pointer rounded-2xl border border-dashed border-slate-300 bg-slate-50 px-4 py-3 text-slate-700 file:mr-4 file:cursor-pointer file:rounded-xl file:border-0 file:bg-brand-500 file:px-4 file:py-2 file:text-white hover:file:bg-brand-600 dark:border-neutral-800 dark:bg-neutral-950 dark:text-neutral-200" />
+          <div class="relative mt-2">
+            <input id="email-file" type="file" name="email-file" accept=".txt,.pdf" class="block w-full cursor-pointer rounded-2xl border border-dashed border-slate-300 bg-slate-50 px-4 py-3 text-slate-700 file:mr-4 file:cursor-pointer file:rounded-xl file:border-0 file:bg-brand-500 file:px-4 file:py-2 file:text-white hover:file:bg-brand-600 dark:border-neutral-800 dark:bg-neutral-950 dark:text-neutral-200" />
+            <button id="clear-file" type="button" aria-label="Remover arquivo" title="Remover arquivo" class="hidden absolute right-3 top-1/2 -translate-y-1/2 rounded-full bg-slate-200 text-slate-700 hover:bg-slate-300 dark:bg-neutral-800 dark:text-neutral-200 dark:hover:bg-neutral-700 px-2 py-1 text-xs">Remover</button>
+          </div>
           <p class="mt-2 text-sm text-slate-500 dark:text-slate-400">Clique para selecionar arquivo</p>
 
           <div class="my-4 flex items-center justify-center">
@@ -85,7 +88,10 @@
           </div>
 
           <label for="email-text" class="block text-sm font-medium text-slate-700 dark:text-neutral-200">Ou digite o conteúdo do email:</label>
-          <div class="mt-2">
+          <div class="mt-2 relative">
+            <div id="disabled-overlay" class="hidden absolute inset-0 bg-white/70 dark:bg-neutral-900/70 z-10 rounded-2xl flex items-center justify-center">
+              <p class="text-slate-500 dark:text-neutral-400 font-medium">Não é possível digitar e enviar arquivos ao mesmo tempo</p>
+            </div>
             <textarea id="email-text" name="email-text" rows="8" placeholder="Cole o conteúdo aqui..." class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-900 shadow-inner outline-none ring-0 focus:border-brand-400 dark:border-neutral-800 dark:bg-neutral-950 dark:text-neutral-200"></textarea>
           </div>
 
@@ -158,6 +164,47 @@
     const processBtn = document.getElementById('processar-btn');
     const btnText = document.getElementById('btn-text');
     const spinner = document.getElementById('spinner');
+    const fileInput = document.getElementById('email-file');
+    const clearFileBtn = document.getElementById('clear-file');
+
+    // Elementos para controle do textarea
+    const emailText = document.getElementById('email-text');
+    const disabledOverlay = document.getElementById('disabled-overlay');
+
+    // Mostrar/ocultar botão de remover e controlar textarea
+    if (fileInput && clearFileBtn) {
+      function updateFileInputState() {
+        const hasFile = fileInput.files && fileInput.files.length > 0;
+        
+        // Mostrar/ocultar botão de remover
+        if (hasFile) {
+          clearFileBtn.classList.remove('hidden');
+          // Desabilitar textarea e mostrar overlay
+          if (emailText) {
+            emailText.disabled = true;
+            emailText.placeholder = ''; // Remove o placeholder
+          }
+          if (disabledOverlay) disabledOverlay.classList.remove('hidden');
+          // Limpar conteúdo do textarea
+          if (emailText) emailText.value = '';
+        } else {
+          clearFileBtn.classList.add('hidden');
+          // Reabilitar textarea e esconder overlay
+          if (emailText) {
+            emailText.disabled = false;
+            emailText.placeholder = 'Cole o conteúdo aqui...'; // Restaura o placeholder
+          }
+          if (disabledOverlay) disabledOverlay.classList.add('hidden');
+        }
+      }
+
+      fileInput.addEventListener('change', updateFileInputState);
+      
+      clearFileBtn.addEventListener('click', () => {
+        fileInput.value = '';
+        updateFileInputState();
+      });
+    }
 
     // Ao enviar, mostrar spinner, esconder texto do botão e alternar mensagens
     form.addEventListener('submit', async (e) => {
@@ -166,6 +213,7 @@
       if (spinner) spinner.classList.remove('hidden');
       if (btnText) btnText.classList.add('sr-only');
       if (processBtn) processBtn.setAttribute('disabled', 'true');
+      if (clearFileBtn) clearFileBtn.classList.add('hidden');
 
       const steps = ['Acessando Email', 'Lendo Email', 'Processando', 'Processando...', 'Processando... .', 'Processando... ..', 'Processando... ...'];
       let i = 0;
