@@ -1,0 +1,35 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.python-version
+.pytest_cache/
+.mypy_cache/
+
+# Virtual Environment
+.venv/
+venv/
+env/
+ENV/
+
+# IDE
+.vscode/
+.idea/
+
+# Logs e arquivos temporários
+*.log
+*.swp
+*.swo
+*~
+
+# Arquivos de versão
+=*
+
+# Arquivos de ambiente
+.env
+.env.*
+!.env.example
+
+# Arquivos de sistema
+.DS_Store
+Thumbs.db

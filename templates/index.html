@@ -55,11 +55,11 @@
       </button>
     </div>
   </header>
-  <main class="min-h-[calc(100vh-56px)] flex items-center justify-center px-4 py-10">
-    <div class="w-full max-w-2xl">
-      <div class="mx-auto mb-6 text-center">
-        <h1 class="text-3xl font-semibold tracking-tight">Classificador de Emails com IA</h1>
-        <p class="mt-2 text-slate-600 dark:text-neutral-400">Classifique automaticamente seus emails em categorias produtivas ou improdutivas e receba sugestões de respostas inteligentes</p>
+  <main class="min-h-[calc(100vh-56px)] flex items-center justify-center px-4 py-6 sm:py-10">
+    <div class="w-full max-w-2xl mx-auto">
+      <div class="mx-auto mb-4 sm:mb-6 text-center px-2 sm:px-0">
+        <h1 class="text-2xl sm:text-3xl font-semibold tracking-tight leading-tight">Classificador de Emails com IA</h1>
+        <p class="mt-2 text-sm sm:text-base text-slate-600 dark:text-neutral-400 max-w-lg mx-auto">Classifique automaticamente seus emails em categorias produtivas ou improdutivas e receba sugestões de respostas inteligentes</p>
       </div>
 
       {% with messages = get_flashed_messages() %}
@@ -70,63 +70,63 @@
         {% endif %}
       {% endwith %}
 
-      <div class="rounded-3xl border border-slate-200 bg-white/90 shadow-xl backdrop-blur dark:border-neutral-800 dark:bg-neutral-900/80">
-        <form id="email-form" action="{{ url_for('processar') }}" method="post" enctype="multipart/form-data" class="p-6 sm:p-8">
-          <h2 class="text-lg font-medium text-slate-800 dark:text-slate-200">Entrada de Email</h2>
+      <div class="rounded-2xl sm:rounded-3xl border border-slate-200 bg-white/90 shadow-lg sm:shadow-xl backdrop-blur dark:border-neutral-800 dark:bg-neutral-900/80 overflow-hidden">
+        <form id="email-form" action="{{ url_for('processar') }}" method="post" enctype="multipart/form-data" class="p-4 sm:p-6 md:p-8">
+          <h2 class="text-base sm:text-lg font-medium text-slate-800 dark:text-slate-200">Entrada de Email</h2>
 
           <label for="email-file" class="mt-4 block text-sm font-medium text-slate-700 dark:text-neutral-200">Upload de Arquivo (.txt, .pdf)</label>
           <div class="relative mt-2">
-            <input id="email-file" type="file" name="email-file" accept=".txt,.pdf" class="block w-full cursor-pointer rounded-2xl border border-dashed border-slate-300 bg-slate-50 px-4 py-3 text-slate-700 file:mr-4 file:cursor-pointer file:rounded-xl file:border-0 file:bg-brand-500 file:px-4 file:py-2 file:text-white hover:file:bg-brand-600 dark:border-neutral-800 dark:bg-neutral-950 dark:text-neutral-200" />
-            <button id="clear-file" type="button" aria-label="Remover arquivo" title="Remover arquivo" class="hidden absolute right-3 top-1/2 -translate-y-1/2 rounded-full bg-slate-200 text-slate-700 hover:bg-slate-300 dark:bg-neutral-800 dark:text-neutral-200 dark:hover:bg-neutral-700 px-2 py-1 text-xs">Remover</button>
+            <input id="email-file" type="file" name="email-file" accept=".txt,.pdf" class="block w-full text-xs sm:text-sm cursor-pointer rounded-xl sm:rounded-2xl border border-dashed border-slate-300 bg-slate-50 px-3 sm:px-4 py-2 sm:py-3 text-slate-700 file:mr-2 sm:file:mr-4 file:cursor-pointer file:rounded-lg file:border-0 file:bg-brand-500 file:px-3 sm:file:px-4 file:py-1.5 sm:file:py-2 file:text-white hover:file:bg-brand-600 dark:border-neutral-800 dark:bg-neutral-950 dark:text-neutral-200" />
+            <button id="clear-file" type="button" aria-label="Remover arquivo" title="Remover arquivo" class="hidden absolute right-2 sm:right-3 top-1/2 -translate-y-1/2 rounded-full bg-slate-200 text-slate-700 hover:bg-slate-300 dark:bg-neutral-800 dark:text-neutral-200 dark:hover:bg-neutral-700 px-1.5 sm:px-2 py-0.5 sm:py-1 text-[10px] sm:text-xs">Remover</button>
           </div>
-          <p class="mt-2 text-sm text-slate-500 dark:text-slate-400">Clique para selecionar arquivo</p>
+          <p class="mt-1.5 text-xs sm:text-sm text-slate-500 dark:text-slate-400">Clique para selecionar arquivo</p>
 
-          <div class="my-4 flex items-center justify-center">
+          <div class="my-3 sm:my-4 flex items-center justify-center">
             <div class="h-px w-full bg-gradient-to-r from-transparent via-slate-200 to-transparent dark:via-neutral-800"></div>
-            <span class="mx-3 text-xs uppercase tracking-wider text-slate-400 dark:text-slate-500">ou</span>
+            <span class="mx-2 sm:mx-3 text-xs uppercase tracking-wider text-slate-400 dark:text-slate-500">ou</span>
             <div class="h-px w-full bg-gradient-to-r from-transparent via-slate-200 to-transparent dark:via-neutral-800"></div>
           </div>
 
           <label for="email-text" class="block text-sm font-medium text-slate-700 dark:text-neutral-200">Ou digite o conteúdo do email:</label>
           <div class="mt-2 relative">
-            <div id="disabled-overlay" class="hidden absolute inset-0 bg-white/70 dark:bg-neutral-900/70 z-10 rounded-2xl flex items-center justify-center">
-              <p class="text-slate-500 dark:text-neutral-400 font-medium">Não é possível digitar e enviar arquivos ao mesmo tempo</p>
+            <div id="disabled-overlay" class="hidden absolute inset-0 bg-white/70 dark:bg-neutral-900/70 z-10 rounded-xl sm:rounded-2xl flex items-center justify-center p-4">
+              <p class="text-xs sm:text-sm text-center text-slate-500 dark:text-neutral-400 font-medium">Não é possível digitar e enviar arquivos ao mesmo tempo</p>
             </div>
-            <textarea id="email-text" name="email-text" rows="8" placeholder="Cole o conteúdo aqui..." class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-900 shadow-inner outline-none ring-0 focus:border-brand-400 dark:border-neutral-800 dark:bg-neutral-950 dark:text-neutral-200"></textarea>
+            <textarea id="email-text" name="email-text" rows="6" placeholder="Cole o conteúdo aqui..." class="w-full text-sm sm:text-base rounded-xl sm:rounded-2xl border border-slate-200 bg-white px-3 sm:px-4 py-2.5 sm:py-3 text-slate-900 shadow-inner outline-none ring-0 focus:border-brand-400 dark:border-neutral-800 dark:bg-neutral-950 dark:text-neutral-200"></textarea>
           </div>
 
-          <div class="mt-6 flex items-center">
-            <button id="processar-btn" type="submit" class="inline-flex items-center gap-2 rounded-full bg-brand-500 hover:bg-brand-600 px-5 py-2.5 font-semibold text-white shadow-md transition">
-              <img id="spinner" src="{{ url_for('static', filename='270-ring.svg') }}" alt="Carregando" class="hidden h-5 w-5" />
-              <span id="btn-text">Processar</span>
+          <div class="mt-6 flex flex-col sm:flex-row items-start sm:items-center">
+            <button id="processar-btn" type="submit" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-full bg-brand-500 hover:bg-brand-600 px-4 sm:px-5 py-2.5 font-semibold text-white shadow-md transition">
+              <img id="spinner" src="{{ url_for('static', filename='270-ring.svg') }}" alt="Carregando" class="hidden h-4 sm:h-5 w-4 sm:w-5" />
+              <span id="btn-text" class="text-sm sm:text-base">Processar</span>
             </button>
-            <span id="status" class="ml-3 text-sm text-slate-500 dark:text-neutral-400" aria-live="polite"></span>
+            <span id="status" class="mt-2 sm:mt-0 sm:ml-3 text-xs sm:text-sm text-center sm:text-left text-slate-500 dark:text-neutral-400" aria-live="polite"></span>
           </div>
         </form>
       </div>
 
-      <section class="mt-8 grid gap-4 sm:grid-cols-2">
-        <div class="rounded-3xl border border-slate-200 bg-white/90 p-6 shadow-xl dark:border-neutral-800 dark:bg-neutral-900/80">
+      <section class="mt-6 sm:mt-8 grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2">
+        <div class="rounded-xl sm:rounded-2xl border border-slate-200 bg-white/90 p-4 sm:p-6 shadow-lg dark:border-neutral-800 dark:bg-neutral-900/80">
           <div class="flex items-start gap-3">
-            <div class="flex h-8 w-8 items-center justify-center rounded-full bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900">1</div>
+            <div class="flex-shrink-0 flex h-6 w-6 sm:h-8 sm:w-8 items-center justify-center rounded-full bg-slate-900 text-xs sm:text-sm font-medium text-white dark:bg-slate-100 dark:text-slate-900">1</div>
             <div>
-              <h3 class="font-semibold">Classificação Inteligente</h3>
-              <p class="mt-1 text-sm text-slate-600 dark:text-neutral-400">Nossa IA analisa o conteúdo do email usando processamento de linguagem natural para identificar se requer ação imediata.</p>
+              <h3 class="text-sm sm:text-base font-semibold">Classificação Inteligente</h3>
+              <p class="mt-1 text-xs sm:text-sm text-slate-600 dark:text-neutral-400">Nossa IA analisa o conteúdo do email usando PLN para identificar se requer ação imediata.</p>
             </div>
           </div>
         </div>
-        <div class="rounded-3xl border border-slate-200 bg-white/90 p-6 shadow-xl dark:border-neutral-800 dark:bg-neutral-900/80">
+        <div class="rounded-xl sm:rounded-2xl border border-slate-200 bg-white/90 p-4 sm:p-6 shadow-lg dark:border-neutral-800 dark:bg-neutral-900/80">
           <div class="flex items-start gap-3">
-            <div class="flex h-8 w-8 items-center justify-center rounded-full bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900">2</div>
+            <div class="flex-shrink-0 flex h-6 w-6 sm:h-8 sm:w-8 items-center justify-center rounded-full bg-slate-900 text-xs sm:text-sm font-medium text-white dark:bg-slate-100 dark:text-slate-900">2</div>
             <div>
-              <h3 class="font-semibold">Respostas Contextuais</h3>
-              <p class="mt-1 text-sm text-slate-600 dark:text-neutral-400">Baseado na classificação, geramos respostas automáticas apropriadas que você pode personalizar e enviar.</p>
+              <h3 class="text-sm sm:text-base font-semibold">Respostas Contextuais</h3>
+              <p class="mt-1 text-xs sm:text-sm text-slate-600 dark:text-neutral-400">Baseado na classificação, geramos respostas automáticas que você pode personalizar.</p>
             </div>
           </div>
         </div>
       </section>
 
-      <p class="mt-4 text-center text-sm text-slate-500 dark:text-neutral-400">Dica: O primeiro processamento pode demorar para baixar o modelo. ☕</p>
+      <p class="mt-4 text-center text-xs sm:text-sm text-slate-500 dark:text-neutral-400">Dica: O primeiro processamento pode demorar para baixar o modelo. ☕</p>
     </div>
   </main>
 

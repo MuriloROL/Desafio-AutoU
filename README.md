@@ -1,8 +1,19 @@
-# Classificador de Emails (Flask + Transformers)
+# 📧 Classificador de Emails
 
-Uma app simples que classifica o conteúdo de emails (texto ou PDF/TXT) em categorias financeiras usando Zero-Shot Classification da Hugging Face.
+[![Python](https://img.shields.io/badge/Python-3.8+-blue.svg)](https://www.python.org/)
+[![Framework](https://img.shields.io/badge/Framework-Flask-green.svg)](https://flask.palletsprojects.com/)
+[![ML](https://img.shields.io/badge/ML-Transformers-orange.svg)](https://huggingface.co/transformers/)
 
-## Como rodar
+Uma aplicação web que classifica automaticamente o conteúdo de emails (texto ou arquivos PDF/TXT) em categorias personalizáveis usando classificação zero-shot da Hugging Face.
+
+## 🚀 Como rodar
+
+### Pré-requisitos
+- Python 3.8 ou superior
+- pip (gerenciador de pacotes do Python)
+- Git (opcional, para clonar o repositório)
+
+### Instalação
 
 1. Crie e ative um ambiente virtual (opcional, recomendado)
    ```bash
@@ -20,7 +31,15 @@ Uma app simples que classifica o conteúdo de emails (texto ou PDF/TXT) em categ
 4. Acesse no navegador:
    - http://localhost:5000
 
-## Categorias
+## 📋 Funcionalidades
+
+- Upload de arquivos (PDF/TXT) ou digitação direta do conteúdo
+- Interface intuitiva e responsiva
+- Suporte a temas claro/escuro
+- Classificação em tempo real
+- Visualização de resultados detalhados
+
+## 🏷️ Categorias
 
 - Por padrão, o app usa as categorias:
   `fatura, comprovante, cobrança, oferta, spam, suporte, relatório, alerta de segurança`.
@@ -29,7 +48,7 @@ Uma app simples que classifica o conteúdo de emails (texto ou PDF/TXT) em categ
   export CATEGORIES="fatura, cobrança, nota fiscal, reunião, spam"
   ```
 
-## Modelo
+## 🤖 Modelo
 
 - Modelo padrão: `joeddav/xlm-roberta-large-xnli` (multilíngue, bom para PT-BR).
 - Para trocar, defina `HF_MODEL`:
@@ -39,8 +58,36 @@ Uma app simples que classifica o conteúdo de emails (texto ou PDF/TXT) em categ
 
 Na primeira execução, o modelo será baixado automaticamente (pode demorar).
 
-## Notas
+## 📝 Notas Técnicas
 
-- PDFs: extração de texto via `pypdf`. PDFs somente imagem não terão texto detectado.
-- Segurança: app usa `dev-secret` se `FLASK_SECRET_KEY` não for definido. Troque em produção.
-- Execução em produção: use algo como `gunicorn -w 2 -b 0.0.0.0:5000 app:create_app()`.
+- **Extração de PDF**: Utiliza `pypdf` para extração de texto. PDFs que são apenas imagem não terão o texto detectado.
+- **Segurança**: 
+  - Em desenvolvimento, usa `dev-secret` como chave secreta.
+  - Para produção, defina a variável de ambiente `FLASK_SECRET_KEY` com uma chave segura.
+- **Performance**:
+  - A primeira classificação pode demorar enquanto o modelo é carregado.
+  - Para produção, considere usar um serviço de cache como Redis.
+- **Deploy em Produção**:
+  ```bash
+  # Usando Gunicorn
+  pip install gunicorn
+  gunicorn -w 4 -b 0.0.0.0:5000 app:create_app()
+  
+  # Ou usando Waitress (Windows)
+  pip install waitress
+  waitress-serve --port=5000 app:create_app()
+  ```
+
+## 📄 Licença
+
+Este projeto está licenciado sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
+
+## 🤝 Contribuição
+
+Contribuições são bem-vindas! Sinta-se à vontade para abrir issues e enviar pull requests.
+
+## 📧 Contato
+
+Seu Nome - [@seu_twitter](https://twitter.com/seu_twitter) - seu.email@exemplo.com
+
+Link do Projeto: [https://github.com/seu-usuario/classificador-emails](https://github.com/seu-usuario/classificador-emails)

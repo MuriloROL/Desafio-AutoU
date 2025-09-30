@@ -1,7 +1,19 @@
+# Dependências principais
 flask>=3.0.0
 transformers>=4.41.0
-sentencepiece>=0.2.0
-pypdf>=4.2.0
 torch>=2.2.0
+
+# Processamento de PDF
+pypdf>=4.2.0
+
+# Processamento de linguagem natural
 nltk>=3.9.1
+sentencepiece>=0.2.0
 protobuf>=4.25.0
+
+# Desenvolvimento e ambiente
+python-dotenv>=1.0.0
+
+# Produção (opcional, descomente se necessário)
+# gunicorn>=21.2.0
+# waitress>=2.1.2

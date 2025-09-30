@@ -53,86 +53,100 @@
       </button>
     </div>
   </header>
-  <main class="min-h-[calc(100vh-56px)] flex items-center justify-center px-4 py-10">
-    <div class="w-full max-w-4xl">
-      <div class="mx-auto mb-6 text-center">
-        <h1 class="text-3xl font-semibold tracking-tight">Resultados</h1>
-        <p class="mt-2 text-slate-600 dark:text-neutral-400">Veja a categoria predita, a confiança e o conteúdo analisado.</p>
+  <main class="min-h-[calc(100vh-56px)] flex items-center justify-center px-4 py-6 sm:py-10">
+    <div class="w-full max-w-4xl mx-auto">
+      <div class="mx-auto mb-4 sm:mb-6 text-center px-2 sm:px-0">
+        <h1 class="text-2xl sm:text-3xl font-semibold tracking-tight leading-tight">Resultados</h1>
+        <p class="mt-2 text-sm sm:text-base text-slate-600 dark:text-neutral-400 max-w-lg mx-auto">Veja a categoria predita, a confiança e o conteúdo analisado.</p>
       </div>
 
-      <section class="rounded-3xl border border-slate-200 bg-white/90 p-6 sm:p-8 shadow-xl backdrop-blur dark:border-neutral-800 dark:bg-neutral-900/80">
-        <h2 class="text-lg font-medium text-slate-800 dark:text-slate-200">Categoria Predita</h2>
-        <p class="mt-3 inline-flex items-center rounded-full bg-brand-500 px-4 py-1.5 text-sm font-semibold text-white shadow">{{ categoria }}</p>
+      <section class="rounded-2xl sm:rounded-3xl border border-slate-200 bg-white/90 p-4 sm:p-6 md:p-8 shadow-lg sm:shadow-xl backdrop-blur dark:border-neutral-800 dark:bg-neutral-900/80">
+        <h2 class="text-base sm:text-lg font-medium text-slate-800 dark:text-slate-200">Categoria Predita</h2>
+        <p class="mt-2 sm:mt-3 inline-flex items-center rounded-full bg-brand-500 px-3 sm:px-4 py-1 sm:py-1.5 text-xs sm:text-sm font-semibold text-white shadow">{{ categoria }}</p>
       </section>
 
-      <section class="mt-6 rounded-3xl border border-slate-200 bg-white/90 p-6 sm:p-8 shadow-xl backdrop-blur dark:border-neutral-800 dark:bg-neutral-900/80">
-        <div class="flex items-center justify-between gap-3">
-          <h2 class="text-lg font-medium text-slate-800 dark:text-slate-200">Resposta Sugerida</h2>
-          <button id="copy-reply" class="inline-flex items-center gap-2 rounded-full bg-brand-500 hover:bg-brand-600 px-4 py-2 text-sm font-semibold text-white shadow disabled:opacity-50 disabled:cursor-not-allowed" type="button" {% if is_spam %}disabled aria-disabled="true" title="Sem resposta para spam"{% endif %}>Copiar</button>
+      <section class="mt-4 sm:mt-6 rounded-2xl sm:rounded-3xl border border-slate-200 bg-white/90 p-4 sm:p-6 md:p-8 shadow-lg sm:shadow-xl backdrop-blur dark:border-neutral-800 dark:bg-neutral-900/80">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <h2 class="text-base sm:text-lg font-medium text-slate-800 dark:text-slate-200">Resposta Sugerida</h2>
+          <button id="copy-reply" class="mt-2 sm:mt-0 w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-full bg-brand-500 hover:bg-brand-600 px-4 py-2 text-sm font-semibold text-white shadow disabled:opacity-50 disabled:cursor-not-allowed" type="button" {% if is_spam %}disabled aria-disabled="true" title="Sem resposta para spam"{% endif %}>
+            <span>Copiar</span>
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+            </svg>
+          </button>
         </div>
-        <textarea id="resposta" readonly rows="5" class="mt-3 w-full rounded-2xl border border-slate-200 bg-slate-50/70 p-4 text-sm text-slate-800 shadow-inner outline-none ring-0 dark:border-neutral-800 dark:bg-neutral-950/60 dark:text-neutral-200" {% if is_spam %}disabled aria-disabled="true"{% endif %}>{{ resposta }}</textarea>
+        <textarea id="resposta" readonly rows="5" class="mt-3 w-full rounded-xl sm:rounded-2xl border border-slate-200 bg-slate-50/70 p-3 sm:p-4 text-xs sm:text-sm text-slate-800 shadow-inner outline-none ring-0 dark:border-neutral-800 dark:bg-neutral-950/60 dark:text-neutral-200" {% if is_spam %}disabled aria-disabled="true"{% endif %}>{{ resposta }}</textarea>
         
         <!-- Modal para SPAM -->
         <div id="spam-modal" class="{% if is_spam %}flex{% else %}hidden{% endif %} fixed inset-0 z-50 items-center justify-center bg-black/50 p-4">
-          <div class="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-6 shadow-xl dark:border-neutral-800 dark:bg-neutral-900">
+          <div class="w-full max-w-md rounded-xl sm:rounded-2xl border border-slate-200 bg-white p-4 sm:p-6 shadow-xl dark:border-neutral-800 dark:bg-neutral-900">
             <div class="flex items-start gap-3">
-              <div class="flex h-8 w-8 items-center justify-center rounded-full bg-red-600 text-white">!</div>
+              <div class="flex-shrink-0 flex h-6 sm:h-8 w-6 sm:w-8 items-center justify-center rounded-full bg-red-600 text-white text-sm sm:text-base">!</div>
               <div class="flex-1">
-                <h3 class="text-base font-semibold text-slate-900 dark:text-neutral-100">Sem resposta para spam</h3>
-                <p class="mt-1 text-sm text-slate-600 dark:text-neutral-300">A mensagem foi classificada como <strong>spam</strong> por ser muito curta ou conter apenas números. Não há resposta sugerida.</p>
+                <h3 class="text-sm sm:text-base font-semibold text-slate-900 dark:text-neutral-100">Sem resposta para spam</h3>
+                <p class="mt-1 text-xs sm:text-sm text-slate-600 dark:text-neutral-300">A mensagem foi classificada como <strong>spam</strong> por ser muito curta ou conter apenas números. Não há resposta sugerida.</p>
               </div>
             </div>
             <div class="mt-4 flex justify-end">
-              <button id="close-spam-modal" type="button" class="inline-flex items-center rounded-full bg-brand-500 hover:bg-brand-600 px-4 py-2 text-sm font-semibold text-white">Entendi</button>
+              <button id="close-spam-modal" type="button" class="inline-flex items-center rounded-full bg-brand-500 hover:bg-brand-600 px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-semibold text-white">Entendi</button>
             </div>
           </div>
         </div>
       </section>
 
       <!-- Box: Classificação de Produtividade -->
-      <section class="mt-6 rounded-3xl border border-slate-200 bg-white/90 p-6 sm:p-8 shadow-xl backdrop-blur dark:border-neutral-800 dark:bg-neutral-900/80">
-        <h2 class="text-lg font-medium text-slate-800 dark:text-slate-200">Classificação de Produtividade</h2>
-        <div class="mt-3 text-sm text-slate-700 dark:text-neutral-300">
-          <ul class="list-disc pl-5 space-y-1">
+      <section class="mt-4 sm:mt-6 rounded-2xl sm:rounded-3xl border border-slate-200 bg-white/90 p-4 sm:p-6 md:p-8 shadow-lg sm:shadow-xl backdrop-blur dark:border-neutral-800 dark:bg-neutral-900/80">
+        <h2 class="text-base sm:text-lg font-medium text-slate-800 dark:text-slate-200">Classificação de Produtividade</h2>
+        <div class="mt-2 sm:mt-3 text-xs sm:text-sm text-slate-700 dark:text-neutral-300">
+          <ul class="list-disc pl-4 sm:pl-5 space-y-1">
             <li><span class="font-semibold">Produtivo</span>: Emails que requerem ação ou resposta específica (ex.: solicitações de suporte, atualização de casos em aberto, dúvidas sobre o sistema).</li>
             <li><span class="font-semibold">Improdutivo</span>: Emails que não necessitam ação imediata (ex.: felicitações, agradecimentos).</li>
           </ul>
         </div>
-        <div class="mt-3">
-          <span class="text-slate-600 dark:text-neutral-300">Este email foi classificado como:</span>
-          <span class="ml-2 inline-flex items-center rounded-full bg-brand-500 px-2.5 py-0.5 text-xs font-semibold text-white">{{ produtividade }}</span>
+        <div class="mt-2 sm:mt-3">
+          <span class="text-xs sm:text-sm text-slate-600 dark:text-neutral-300">Este email foi classificado como:</span>
+          <span class="ml-2 inline-flex items-center rounded-full bg-brand-500 px-2 sm:px-2.5 py-0.5 text-[10px] sm:text-xs font-semibold text-white">{{ produtividade }}</span>
         </div>
       </section>
 
-      <section class="mt-6 rounded-3xl border border-neutral-200 bg-white/90 p-6 sm:p-8 shadow-xl backdrop-blur dark:border-neutral-800 dark:bg-neutral-900/80">
-        <h2 class="text-lg font-medium text-neutral-800 dark:text-neutral-200">Ranking de Confiança</h2>
-        <div class="mt-4 overflow-hidden rounded-2xl border border-neutral-200 dark:border-neutral-800">
-          <table class="min-w-full divide-y divide-neutral-200 dark:divide-neutral-800">
-            <thead class="bg-neutral-50/70 dark:bg-neutral-900/60">
-              <tr>
-                <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-neutral-500 dark:text-neutral-400">Categoria</th>
-                <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-neutral-500 dark:text-neutral-400">Confiança</th>
-              </tr>
-            </thead>
-            <tbody class="divide-y divide-neutral-100 bg-white/60 dark:divide-neutral-800 dark:bg-neutral-900/40">
-              {% for label, score in ranking %}
-              <tr class="hover:bg-neutral-50/80 dark:hover:bg-neutral-900/70">
-                <td class="px-4 py-3 text-sm text-neutral-800 dark:text-neutral-200">{{ label }}</td>
-                <td class="px-4 py-3 text-sm text-neutral-800 dark:text-neutral-200">{{ '%.1f' % (score * 100) }}%</td>
-              </tr>
-              {% endfor %}
-            </tbody>
-          </table>
+      <section class="mt-4 sm:mt-6 rounded-2xl sm:rounded-3xl border border-neutral-200 bg-white/90 p-4 sm:p-6 md:p-8 shadow-lg sm:shadow-xl backdrop-blur dark:border-neutral-800 dark:bg-neutral-900/80">
+        <h2 class="text-base sm:text-lg font-medium text-neutral-800 dark:text-neutral-200">Ranking de Confiança</h2>
+        <div class="mt-3 sm:mt-4 overflow-x-auto">
+          <div class="min-w-full inline-block align-middle">
+            <div class="overflow-hidden rounded-xl sm:rounded-2xl border border-neutral-200 dark:border-neutral-800">
+              <table class="min-w-full divide-y divide-neutral-200 dark:divide-neutral-800">
+                <thead class="bg-neutral-50/70 dark:bg-neutral-900/60">
+                  <tr>
+                    <th class="px-3 sm:px-4 py-2 sm:py-3 text-left text-[10px] sm:text-xs font-semibold uppercase tracking-wider text-neutral-500 dark:text-neutral-400">Categoria</th>
+                    <th class="px-3 sm:px-4 py-2 sm:py-3 text-left text-[10px] sm:text-xs font-semibold uppercase tracking-wider text-neutral-500 dark:text-neutral-400">Confiança</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-neutral-100 bg-white/60 dark:divide-neutral-800 dark:bg-neutral-900/40">
+                  {% for label, score in ranking %}
+                  <tr class="hover:bg-neutral-50/80 dark:hover:bg-neutral-900/70">
+                    <td class="px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-neutral-800 dark:text-neutral-200">{{ label }}</td>
+                    <td class="px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-neutral-800 dark:text-neutral-200">{{ '%.1f' % (score * 100) }}%</td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
         </div>
       </section>
 
-      <section class="mt-6 rounded-3xl border border-neutral-200 bg-white/90 p-6 sm:p-8 shadow-xl backdrop-blur dark:border-neutral-800 dark:bg-neutral-900/80">
-        <h2 class="text-lg font-medium text-neutral-800 dark:text-neutral-200">Texto do Email</h2>
-        <pre class="mt-3 rounded-2xl border border-neutral-200 bg-neutral-50/70 p-4 text-sm text-neutral-800 whitespace-pre-wrap dark:border-neutral-800 dark:bg-neutral-950/60 dark:text-neutral-200">{{ texto }}</pre>
+      <section class="mt-4 sm:mt-6 rounded-2xl sm:rounded-3xl border border-neutral-200 bg-white/90 p-4 sm:p-6 md:p-8 shadow-lg sm:shadow-xl backdrop-blur dark:border-neutral-800 dark:bg-neutral-900/80">
+        <h2 class="text-base sm:text-lg font-medium text-neutral-800 dark:text-neutral-200">Texto do Email</h2>
+        <pre class="mt-2 sm:mt-3 rounded-xl sm:rounded-2xl border border-neutral-200 bg-neutral-50/70 p-3 sm:p-4 text-xs sm:text-sm text-neutral-800 whitespace-pre-wrap dark:border-neutral-800 dark:bg-neutral-950/60 dark:text-neutral-200">{{ texto }}</pre>
       </section>
 
-      <div class="mt-8 text-center">
-        <a class="inline-flex items-center gap-2 rounded-full bg-brand-500 hover:bg-brand-600 px-5 py-2.5 font-semibold text-white shadow-md transition" href="{{ url_for('index') }}">Classificar outro email</a>
+      <div class="mt-6 sm:mt-8 text-center">
+        <a class="inline-flex items-center justify-center gap-2 rounded-full bg-brand-500 hover:bg-brand-600 px-4 sm:px-5 py-2 sm:py-2.5 text-sm sm:text-base font-semibold text-white shadow-md transition w-full sm:w-auto" href="{{ url_for('index') }}">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 sm:h-5 sm:w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+          </svg>
+          <span>Classificar outro email</span>
+        </a>
       </div>
     </div>
   </main>
