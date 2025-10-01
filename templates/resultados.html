@@ -6,6 +6,7 @@
   <title>Resultados - Classificador</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
+    // Configuração do Tailwind
     tailwind.config = {
       darkMode: 'class',
       theme: {
@@ -19,17 +20,15 @@
           }
         }
       }
-    }
+    };
+    
+    // Tratamento global de erros
+    window.onerror = function(message, source, lineno, colno, error) {
+      console.error('Erro global:', {message, source, lineno, colno, error});
+      return true; // Impede o comportamento padrão do navegador
+    };
   </script>
   <link rel="icon" href="{{ url_for('static', filename='logo-autou.png') }}" type="image/png" />
-  <script>
-    (function() {
-      const saved = localStorage.getItem('theme');
-      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      const useDark = saved ? saved === 'dark' : prefersDark;
-      if (useDark) document.documentElement.classList.add('dark');
-    })();
-  </script>
 </head>
 <body class="bg-slate-50 text-slate-900 antialiased dark:bg-neutral-950 dark:text-neutral-200">
   <header class="sticky top-0 z-10 border-b border-slate-200/70 bg-white/70 backdrop-blur dark:border-neutral-800/50 dark:bg-neutral-950/70">
@@ -47,12 +46,13 @@
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4">
             <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"></path>
           </svg>
-          <div id="theme-thumb" class="absolute left-1 top-1 h-6 w-6 rounded-full bg-white shadow transition-transform duration-300 ease-out dark:bg-neutral-100"></div>
+          <div id="theme-thumb" class="absolute left-1 top-1 h-6 w-6 rounded-full bg-white shadow transition-transform duration-300 ease-out dark:translate-x-8 dark:bg-neutral-100"></div>
         </div>
         <span id="theme-label" class="sr-only">Tema</span>
       </button>
     </div>
   </header>
+
   <main class="min-h-[calc(100vh-56px)] flex items-center justify-center px-4 py-6 sm:py-10">
     <div class="w-full max-w-4xl mx-auto">
       <div class="mx-auto mb-4 sm:mb-6 text-center px-2 sm:px-0">
@@ -94,7 +94,6 @@
         </div>
       </section>
 
-      <!-- Box: Classificação de Produtividade -->
       <section class="mt-4 sm:mt-6 rounded-2xl sm:rounded-3xl border border-slate-200 bg-white/90 p-4 sm:p-6 md:p-8 shadow-lg sm:shadow-xl backdrop-blur dark:border-neutral-800 dark:bg-neutral-900/80">
         <h2 class="text-base sm:text-lg font-medium text-slate-800 dark:text-slate-200">Classificação de Produtividade</h2>
         <div class="mt-2 sm:mt-3 text-xs sm:text-sm text-slate-700 dark:text-neutral-300">
@@ -150,84 +149,104 @@
       </div>
     </div>
   </main>
+
   <script>
-    const btn = document.getElementById('theme-toggle');
-    const label = document.getElementById('theme-label');
-    function setTheme(mode){
+    // Função para definir o tema
+    function setTheme(mode) {
       const root = document.documentElement;
-      const thumb = document.getElementById('theme-thumb');
-      if(mode==='dark'){
+      const themeLabel = document.getElementById('theme-label');
+      const themeThumb = document.getElementById('theme-thumb');
+      
+      if (mode === 'dark') {
         root.classList.add('dark');
-        localStorage.setItem('theme','dark');
-        if(label) label.textContent = 'Escuro';
-        if(thumb) thumb.classList.add('translate-x-8');
+        localStorage.setItem('theme', 'dark');
+        if (themeLabel) themeLabel.textContent = 'Escuro';
+        if (themeThumb) themeThumb.classList.add('translate-x-8');
       } else {
         root.classList.remove('dark');
-        localStorage.setItem('theme','light');
-        if(label) label.textContent = 'Claro';
-        if(thumb) thumb.classList.remove('translate-x-8');
+        localStorage.setItem('theme', 'light');
+        if (themeLabel) themeLabel.textContent = 'Claro';
+        if (themeThumb) themeThumb.classList.remove('translate-x-8');
       }
     }
-    (function initTheme(){
-      const saved = localStorage.getItem('theme');
-      const isDark = saved ? saved==='dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
-      setTheme(isDark ? 'dark':'light');
-    })();
-    if(btn){ btn.addEventListener('click', ()=>{ const isDark = document.documentElement.classList.contains('dark'); setTheme(isDark ? 'light' : 'dark'); }); }
 
-    // Copy suggested reply
-    const copyBtn = document.getElementById('copy-reply');
-    const replyEl = document.getElementById('resposta');
-    if (copyBtn && replyEl) {
-      copyBtn.addEventListener('click', async () => {
-        if (copyBtn.hasAttribute('disabled')) return; // Guard for spam
-        try {
-          await navigator.clipboard.writeText(replyEl.value);
-          const original = copyBtn.textContent;
-          copyBtn.textContent = 'Copiado!';
-          setTimeout(() => copyBtn.textContent = original, 1200);
-        } catch (e) {
-          // Fallback
-          replyEl.select();
-          document.execCommand('copy');
-          const original = copyBtn.textContent;
-          copyBtn.textContent = 'Copiado!';
-          setTimeout(() => copyBtn.textContent = original, 1200);
+    // Inicialização quando o DOM estiver pronto
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log('DOM totalmente carregado');
+      
+      // Configuração do tema
+      try {
+        const saved = localStorage.getItem('theme');
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const isDark = saved ? saved === 'dark' : prefersDark;
+        setTheme(isDark ? 'dark' : 'light');
+      } catch (e) {
+        console.error('Erro ao carregar tema:', e);
+      }
+
+      // Configuração do botão de tema
+      const themeToggle = document.getElementById('theme-toggle');
+      if (themeToggle) {
+        themeToggle.addEventListener('click', function() {
+          const isDark = document.documentElement.classList.contains('dark');
+          setTheme(isDark ? 'light' : 'dark');
+        });
+      }
+
+      // Configuração do botão de cópia
+      const copyBtn = document.getElementById('copy-reply');
+      const replyEl = document.getElementById('resposta');
+      
+      if (copyBtn && replyEl) {
+        copyBtn.addEventListener('click', async function() {
+          if (copyBtn.hasAttribute('disabled')) return;
+          
+          try {
+            if (navigator.clipboard) {
+              await navigator.clipboard.writeText(replyEl.value);
+            } else {
+              replyEl.select();
+              document.execCommand('copy');
+            }
+            
+            const originalText = copyBtn.innerHTML;
+            copyBtn.innerHTML = '<span>Copiado!</span>';
+            copyBtn.disabled = true;
+            
+            setTimeout(() => {
+              copyBtn.innerHTML = originalText;
+              copyBtn.disabled = false;
+            }, 2000);
+            
+          } catch (err) {
+            console.error('Falha ao copiar texto:', err);
+            alert('Não foi possível copiar o texto. Por favor, copie manualmente.');
+          }
+        });
+      }
+
+      // Configuração do modal de spam
+      const spamModal = document.getElementById('spam-modal');
+      const closeSpam = document.getElementById('close-spam-modal');
+      
+      if (spamModal) {
+        function hideSpam() { 
+          spamModal.classList.add('hidden');
         }
-      });
-    }
-
-    // Popover toggle and outside click handling
-    const openPop = document.getElementById('open-popover');
-    const popover = document.getElementById('popover');
-    function hidePopover(){ if(popover) popover.classList.add('hidden'); }
-    function togglePopover(){ if(popover) popover.classList.toggle('hidden'); }
-    if (openPop && popover) {
-      openPop.addEventListener('click', (e) => {
-        e.stopPropagation();
-        togglePopover();
-      });
-      document.addEventListener('click', (e) => {
-        if (!popover.classList.contains('hidden')) {
-          const target = e.target;
-          if (!popover.contains(target) && target !== openPop) hidePopover();
+        
+        if (closeSpam) {
+          closeSpam.addEventListener('click', hideSpam);
         }
-      });
-      document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') hidePopover();
-      });
-    }
-
-    // SPAM modal close handlers
-    const spamModal = document.getElementById('spam-modal');
-    const closeSpam = document.getElementById('close-spam-modal');
-    function hideSpam(){ if(spamModal) spamModal.classList.add('hidden'); }
-    if (spamModal) {
-      if (closeSpam) closeSpam.addEventListener('click', hideSpam);
-      spamModal.addEventListener('click', (e) => { if (e.target === spamModal) hideSpam(); });
-      document.addEventListener('keydown', (e) => { if (e.key === 'Escape') hideSpam(); });
-    }
-
+        
+        spamModal.addEventListener('click', function(e) { 
+          if (e.target === spamModal) hideSpam();
+        });
+        
+        document.addEventListener('keydown', function(e) { 
+          if (e.key === 'Escape') hideSpam();
+        });
+      }
+    });
   </script>
 </body>
 </html>
